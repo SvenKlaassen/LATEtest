@@ -11,7 +11,7 @@ invisible(lapply(packages, library, character.only = TRUE))
 
 system <- Sys.info()['sysname']
 if(system == 'Windows') {
-  setwd("C:/Users/farbma/Documents/GitHub/LATEtest/Simulations")    # my path Windows
+  setwd("Simulations/Additional_Simulations")    # my path Windows
 } else if(system == 'Darwin') {
   setwd("/Users/helmut/Documents/GitHub/LATEtest/Simulations")      # my path Mac
 }
@@ -73,8 +73,8 @@ set.seed(seed)
 ##### Setup DGP #####
 #####################
 setup <- "A"          # A: randomized experiment, B: easy confounding of Z and strong confounding of D
-n <- 5000             # number of observations
-R <- 500              # number of Monte Carlo replications
+n <- 3000             # number of observations
+R <- 5              # number of Monte Carlo replications
 
 subsets <- 4
 siglevel <- 0.05

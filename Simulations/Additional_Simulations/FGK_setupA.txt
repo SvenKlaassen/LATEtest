@@ -1,0 +1,58 @@
+[1] "2020-08-13 07:36:46 CEST"
+[1] "-----------------------"
+[1] "setup, n, R, seed, subsets, siglevel"
+[1] "A / 3000 / 5 / 1234 / 4 / 0.05"
+[1] "--------------------------------------------"
+[1] "--------------------------------------------"
+Time difference of 50.07 secs
+[1] "dgp"
+[1] 0
+         round Tmax0 Tmax1 Tmax2  cv0  cv1  cv2 reject0 reject1 reject2 dim0 dim1 dim2 reject_BHolm_0 reject_BHolm_1
+result.1     1 1.229 1.101 1.101 2.82 2.73 2.69       0       0       0   21   16   14              0              0
+result.2     2 1.860 1.860 1.860 2.73 2.73 2.73       0       0       0   16   16   16              0              0
+result.3     3 1.106 1.106 1.106 2.77 2.75 2.73       0       0       0   18   17   16              0              0
+result.4     4 0.831 0.831 0.831 2.75 2.71 2.71       0       0       0   17   15   15              0              0
+result.5     5 1.705 1.705 1.705 2.82 2.79 2.73       0       0       0   21   19   16              0              0
+         reject_BHolm_2 reject_BHoch_0 reject_BHoch_1 reject_BHoch_2 reject_BY_0 reject_BY_1 reject_BY_2
+result.1              0              0              0              0           0           0           0
+result.2              0              0              0              0           0           0           0
+result.3              0              0              0              0           0           0           0
+result.4              0              0              0              0           0           0           0
+result.5              0              0              0              0           0           0           0
+[1] "summary(sim$Tmax0/1/2)"
+       Min. 1st Qu. Median  Mean 3rd Qu. Max.
+[1,] 0.8307   1.106  1.229 1.346   1.705 1.86
+[2,] 0.8307   1.101  1.106 1.321   1.705 1.86
+[3,] 0.8307   1.101  1.106 1.321   1.705 1.86
+[1] "summary(sim$cv0/1/2)"
+      Min. 1st Qu. Median  Mean 3rd Qu.  Max.
+[1,] 2.734   2.754  2.773 2.781   2.823 2.823
+[2,] 2.713   2.734  2.734 2.745   2.754 2.790
+[3,] 2.690   2.713  2.734 2.721   2.734 2.734
+[1] "mean(sim$reject0/1/2)"
+[1] 0 0 0
+[1] "mean(sim$reject_BHolm_0/1/2)"
+[1] 0 0 0
+[1] "mean(sim$reject_BHoch_0/1/2)"
+[1] 0 0 0
+[1] "mean(sim$reject_BY_0/1/2)"
+[1] 0 0 0
+[1] ""
+[1] "summary(sim$dim0/1/2)"
+     Min. 1st Qu. Median Mean 3rd Qu. Max.
+[1,]   16      17     18 18.6      21   21
+[2,]   15      16     16 16.6      17   19
+[3,]   14      15     16 15.4      16   16
+[1] "table(sim$dim0)"
+
+16 17 18 21 
+ 1  1  1  2 
+[1] "table(sim$dim1)"
+
+15 16 17 19 
+ 1  2  1  1 
+[1] "table(sim$dim2)"
+
+14 15 16 
+ 1  1  3 
+[1] "--------------------------------------"
