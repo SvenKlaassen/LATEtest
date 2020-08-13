@@ -202,9 +202,9 @@ LATEtest <- function(data, covars, huge=FALSE, tree_fraction=0.5, minsize=100, c
   # cummax to enforce monotonicity
   p_value_BHolm_zeta <- cummax(sapply(1:p0, function(i) min((p0+1-i)*(1-pnorm(zeta_sort$x[i])),1)))[zeta_sort$ix]
   # Use Benjamini-Hochberg to determine p-values for each tested leaf
-  p_value_BHoch_zeta <- cummax(sapply(1:p0, function(i) min(p0/i*(1-pnorm(zeta_sort$x[i])),1)))[zeta_sort$ix]
+  p_value_BHoch_zeta <- cummin(sapply(1:p0, function(i) min(p0/i*(1-pnorm(zeta_sort$x[i])),1)))[zeta_sort$ix]
   # Use Benjamini-Yekutieli to determine p-values for each tested leaf
-  p_value_BY_zeta <- cummax(sapply(1:p0, function(i) min(p0* sum(1/(1:p0))/i*(1-pnorm(zeta_sort$x[i])),1)))[zeta_sort$ix]
+  p_value_BY_zeta <- cummin(sapply(1:p0, function(i) min(p0* sum(1/(1:p0))/i*(1-pnorm(zeta_sort$x[i])),1)))[zeta_sort$ix]
 
   sel1_final <- c()
   for (x in 1:ncol(zeta)) {
@@ -233,8 +233,8 @@ LATEtest <- function(data, covars, huge=FALSE, tree_fraction=0.5, minsize=100, c
   cv2 <- qnorm(1 - alpha / p2)
   zeta2_sort <- sort(zeta2,decreasing = T, index.return = T)
   p_value_BHolm_zeta2 <- cummax(sapply(1:p2, function(i) min((p2+1-i)*(1-pnorm(zeta2_sort$x[i])),1)))[zeta2_sort$ix]
-  p_value_BHoch_zeta2 <- cummax(sapply(1:p2, function(i) min(p2/i*(1-pnorm(zeta2_sort$x[i])),1)))[zeta2_sort$ix]
-  p_value_BY_zeta2 <- cummax(sapply(1:p2, function(i) min(p1* sum(1/(1:p1))/i*(1-pnorm(zeta2_sort$x[i])),1)))[zeta2_sort$ix]
+  p_value_BHoch_zeta2 <- cummin(sapply(1:p2, function(i) min(p2/i*(1-pnorm(zeta2_sort$x[i])),1)))[zeta2_sort$ix]
+  p_value_BY_zeta2 <- cummin(sapply(1:p2, function(i) min(p1* sum(1/(1:p1))/i*(1-pnorm(zeta2_sort$x[i])),1)))[zeta2_sort$ix]
 
   #-------------------------------------------------------------------------------------------
   # Store additional tree info:

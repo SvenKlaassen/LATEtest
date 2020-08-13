@@ -83,7 +83,7 @@ siglevel <- 0.05
 ####################################
 system <- Sys.info()['sysname']
 if(system == 'Windows') {
-  cl <- makeCluster(detectCores())
+  cl <- makeCluster(detectCores()-1)
   clusterEvalQ(cl, c(library(LATEtest),library(grf),library(rpart),library(treeClust),library(mvtnorm)))
 } else if(system == 'Darwin') {
   cl <- makeForkCluster(detectCores())
