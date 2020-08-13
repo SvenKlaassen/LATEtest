@@ -74,7 +74,7 @@ set.seed(seed)
 #####################
 setup <- "A"          # A: randomized experiment, B: easy confounding of Z and strong confounding of D
 n <- 3000             # number of observations
-R <- 5              # number of Monte Carlo replications
+R <- 500              # number of Monte Carlo replications
 
 subsets <- 4
 siglevel <- 0.05
