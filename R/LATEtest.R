@@ -82,10 +82,12 @@ LATEtest <- function(data, covars, huge=FALSE, tree_fraction=0.5, minsize=100, c
   zeta <- sel1 <- sel2 <- treelist_names <- c()
   zetaQ1_info <- vector("list", length = (2 * luY)); zetaQ0_info <- vector("list", length = (2 * luY))
   treelistQ1 <- vector("list", length = luY); treelistQ0 <- vector("list", length = luY)
+  score_mat <- Matrix::bdiag()
 
   #------------------------------------------------------------------------------------------------
   # first for Q1 (d=1):
   for (y in 1:luY) {
+    temp_score_mat <- Matrix::bdiag()
 
     temp_oob <- oob(sampleA, y, huge, tree_fraction, minsize, 1)
     sampleA$Q <- temp_oob$Q; sampleA$Qhat <- temp_oob$Qhat; sampleA$tauhat <- temp_oob$tauhat
@@ -98,6 +100,7 @@ LATEtest <- function(data, covars, huge=FALSE, tree_fraction=0.5, minsize=100, c
     ########################
     temp <- estimation(sampleB, sampleA, y, covars, 1, minsize, cp)
     zeta <- cbind(zeta, temp$est$zeta)
+    temp_score_mat <- Matrix::bdiag(score_mat,t(temp$est$scores))
     sel1 <- c(sel1, temp$relevant)                    # exclude leaves with a significant fraction of compliers
     sel2 <- c(sel2, temp$relevant * temp$largest)     # take only promising leaves (largest binary split)
 
@@ -112,6 +115,7 @@ LATEtest <- function(data, covars, huge=FALSE, tree_fraction=0.5, minsize=100, c
     ########################
     temp <- estimation(sampleA, sampleB, y, covars, 1, minsize, cp)
     zeta <- cbind(zeta, temp$est$zeta)
+    temp_score_mat <- Matrix::bdiag(score_mat,t(temp$est$scores))
     sel1 <- c(sel1, temp$relevant)                    # exclude leaves with a significant fraction of compliers
     sel2 <- c(sel2, temp$relevant * temp$largest)     # take only promising leaves (largest binary split)
 
@@ -139,6 +143,7 @@ LATEtest <- function(data, covars, huge=FALSE, tree_fraction=0.5, minsize=100, c
     ########################
     temp <- estimation(sampleB, sampleA, y, covars, 0, minsize, cp)
     zeta <- cbind(zeta, temp$est$zeta)
+    temp_score_mat <- Matrix::bdiag(score_mat,t(temp$est$scores))
     sel1 <- c(sel1, temp$relevant)                    # exclude leaves with a significant fraction of compliers
     sel2 <- c(sel2, temp$relevant * temp$largest)     # take only promising leaves (largest binary split)
 
@@ -154,6 +159,7 @@ LATEtest <- function(data, covars, huge=FALSE, tree_fraction=0.5, minsize=100, c
 
     temp <- estimation(sampleA, sampleB, y, covars, 0, minsize, cp)
     zeta <- cbind(zeta, temp$est$zeta)
+    temp_score_mat <- Matrix::bdiag(score_mat,t(temp$est$scores))
     sel1 <- c(sel1, temp$relevant)                    # exclude leaves with a significant fraction of compliers
     sel2 <- c(sel2, temp$relevant * temp$largest)     # take only promising leaves (largest binary split)
 
@@ -163,6 +169,7 @@ LATEtest <- function(data, covars, huge=FALSE, tree_fraction=0.5, minsize=100, c
     treelistQ0[[(2*y)]] <- temp$tree
     treelist_names <- c(treelist_names, paste0("tree_Q0B", y))
     rm(temp)
+
 
   }
   zeta_all <- cbind(zeta_all, zeta); sel1_all <- as.logical(t(cbind(sel1_all, sel1))); sel2_all <- as.logical(t(cbind(sel2_all, sel2)))
@@ -190,6 +197,14 @@ LATEtest <- function(data, covars, huge=FALSE, tree_fraction=0.5, minsize=100, c
   p0 <- ncol(zeta)
   T0 <- max(zeta)
   cv0 <- qnorm(1 - alpha / p0)
+  # Use Bonferroni-Holm to determine p-values for each tested leaf
+  zeta_sort <- sort(zeta,decreasing = T, index.return = T)
+  # cummax to enforce monotonicity
+  p_value_BHolm_zeta <- cummax(sapply(1:p0, function(i) min((p0+1-i)*(1-pnorm(zeta_sort$x[i])),1)))[zeta_sort$ix]
+  # Use Benjamini-Hochberg to determine p-values for each tested leaf
+  p_value_BHoch_zeta <- cummax(sapply(1:p0, function(i) min(p0/i*(1-pnorm(zeta_sort$x[i])),1)))[zeta_sort$ix]
+  # Use Benjamini-Yekutieli to determine p-values for each tested leaf
+  p_value_BY_zeta <- cummax(sapply(1:p0, function(i) min(p0* sum(1/(1:p0))/i*(1-pnorm(zeta_sort$x[i])),1)))[zeta_sort$ix]
 
   sel1_final <- c()
   for (x in 1:ncol(zeta)) {
@@ -201,6 +216,10 @@ LATEtest <- function(data, covars, huge=FALSE, tree_fraction=0.5, minsize=100, c
   p1 <- ncol(zeta1)
   T1 <- max(zeta1)
   cv1 <- qnorm(1 - alpha / p1)
+  zeta1_sort <- sort(zeta1,decreasing = T, index.return = T)
+  p_value_BHolm_zeta1 <- cummax(sapply(1:p1, function(i) min((p1+1-i)*(1-pnorm(zeta1_sort$x[i])),1)))[zeta1_sort$ix]
+  p_value_BHoch_zeta1 <- cummin(sapply(1:p1, function(i) min(p1/i*(1-pnorm(zeta1_sort$x[i])),1)))[zeta1_sort$ix]
+  p_value_BY_zeta1 <- cummin(sapply(1:p1, function(i) min(p1* sum(1/(1:p1))/i*(1-pnorm(zeta1_sort$x[i])),1)))[zeta1_sort$ix]
 
   sel2_final <- c()
   for(x in 1:ncol(zeta)) {
@@ -212,6 +231,10 @@ LATEtest <- function(data, covars, huge=FALSE, tree_fraction=0.5, minsize=100, c
   p2 <- ncol(zeta2)
   T2 <- max(zeta2)
   cv2 <- qnorm(1 - alpha / p2)
+  zeta2_sort <- sort(zeta2,decreasing = T, index.return = T)
+  p_value_BHolm_zeta2 <- cummax(sapply(1:p2, function(i) min((p2+1-i)*(1-pnorm(zeta2_sort$x[i])),1)))[zeta2_sort$ix]
+  p_value_BHoch_zeta2 <- cummax(sapply(1:p2, function(i) min(p2/i*(1-pnorm(zeta2_sort$x[i])),1)))[zeta2_sort$ix]
+  p_value_BY_zeta2 <- cummax(sapply(1:p2, function(i) min(p1* sum(1/(1:p1))/i*(1-pnorm(zeta2_sort$x[i])),1)))[zeta2_sort$ix]
 
   #-------------------------------------------------------------------------------------------
   # Store additional tree info:
@@ -242,6 +265,10 @@ LATEtest <- function(data, covars, huge=FALSE, tree_fraction=0.5, minsize=100, c
   results$cv <- cbind(cv0, cv1, cv2)
   results$reject <- cbind(T0 > cv0, T1 > cv1, T2 > cv2)
   results$pvalue <- cbind(min(p0 * (1 - pnorm(T0)), 1), min(p1 * (1 - pnorm(T1)), 1), min(p2 * (1 - pnorm(T2)), 1))
+  results$pvalues_BHolm_leaves <- list(p_value_BHolm_zeta,p_value_BHolm_zeta1,p_value_BHolm_zeta2)
+  results$pvalues_BHoch_leaves <- list(p_value_BHoch_zeta,p_value_BHoch_zeta1,p_value_BHoch_zeta2)
+  results$pvalues_BY_leaves <- list(p_value_BY_zeta,p_value_BY_zeta1,p_value_BY_zeta2)
+
   return(list("treelist" = treelist, "maxTtree" = maxTtree, "descriptives" = descriptives, "parameters" = parameters,
               "leafinfo" = leafinfo, "results" = results))
 }

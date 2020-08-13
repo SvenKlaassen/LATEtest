@@ -73,8 +73,8 @@ set.seed(seed)
 ##### Setup DGP #####
 #####################
 setup <- "A"          # A: randomized experiment, B: easy confounding of Z and strong confounding of D
-n <- 3000             # number of observations
-R <- 1000              # number of Monte Carlo replications
+n <- 5000             # number of observations
+R <- 500              # number of Monte Carlo replications
 
 subsets <- 4
 siglevel <- 0.05
@@ -99,6 +99,7 @@ print(paste(setup, n, R, seed, subsets, siglevel, sep=" / "))
 print("--------------------------------------------")
 print("--------------------------------------------")
 
+
 ##### Run simulation #####
 ##########################
 for (dgp in 0:5) {         #loop over all dgps; see fct_datasim() above
@@ -108,11 +109,20 @@ for (dgp in 0:5) {         #loop over all dgps; see fct_datasim() above
     data <- fct_datasim(setup=setup, dgp=dgp)
 
     test <- LATEtest(data=data, covars=paste0(colnames(data)[4:ncol(data)]), subsets=subsets, alpha=siglevel)
-    return(c(r, test$results$Tmax,test$results$cv,test$results$reject,test$results$nu_ineq))
+
+    reject_BHolm <- sapply(test$results$pvalues_BHolm_leaves, function(x) any(x<siglevel))
+    reject_BHoch <- sapply(test$results$pvalues_BHoch_leaves, function(x) any(x<siglevel))
+    reject_BY <- sapply(test$results$pvalues_BY_leaves, function(x) any(x<siglevel))
+    return(c(r, test$results$Tmax,test$results$cv,test$results$reject,
+             test$results$nu_ineq,reject_BHolm,reject_BHoch,reject_BY))
   }
   end_time = Sys.time()
   print(end_time - start_time)
-  colnames(sim) <- c("round","Tmax0","Tmax1","Tmax2","cv0","cv1","cv2","reject0","reject1","reject2","dim0","dim1","dim2")
+  colnames(sim) <- c("round","Tmax0","Tmax1","Tmax2","cv0","cv1","cv2",
+                     "reject0","reject1","reject2","dim0","dim1","dim2",
+                     "reject_BHolm_0","reject_BHolm_1","reject_BHolm_2",
+                     "reject_BHoch_0","reject_BHoch_1","reject_BHoch_2",
+                     "reject_BY_0","reject_BY_1","reject_BY_2")
   sim <- as.data.frame(sim)
 
   ##### Display results #####
@@ -126,6 +136,12 @@ for (dgp in 0:5) {         #loop over all dgps; see fct_datasim() above
   print(rbind(summary(sim$cv0),summary(sim$cv1),summary(sim$cv2)))
   print("mean(sim$reject0/1/2)")
   print(c(mean(sim$reject0),mean(sim$reject1),mean(sim$reject2)))
+  print("mean(sim$reject_BHolm_0/1/2)")
+  print(c(mean(sim$reject_BHolm_0),mean(sim$reject_BHolm_1),mean(sim$reject_BHolm_2)))
+  print("mean(sim$reject_BHoch_0/1/2)")
+  print(c(mean(sim$reject_BHoch_0),mean(sim$reject_BHoch_1),mean(sim$reject_BHoch_2)))
+  print("mean(sim$reject_BY_0/1/2)")
+  print(c(mean(sim$reject_BY_0),mean(sim$reject_BY_1),mean(sim$reject_BY_2)))
   print("")
   print("summary(sim$dim0/1/2)")
   print(rbind(summary(sim$dim0),summary(sim$dim1),summary(sim$dim2)))
@@ -135,7 +151,7 @@ for (dgp in 0:5) {         #loop over all dgps; see fct_datasim() above
   print(table(sim$dim1))
   print("table(sim$dim2)")
   print(table(sim$dim2))
-  save.image(file=paste("FGK","_setup",setup,"_dgp",dgp,".Rdata",sep=""))
+  save.image(file=paste("FGK","_setup",setup,"_n",n,"_subsets",subsets,"_dgp",dgp,".Rdata",sep=""))
   print("--------------------------------------")
 }
 sink(file=NULL)

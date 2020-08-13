@@ -4,8 +4,17 @@
 \alias{LATEtest}
 \title{LATEtest}
 \usage{
-LATEtest(data, covars, huge = FALSE, tree_fraction = 0.5,
-  minsize = 100, cp = 0, subsets = 4, alpha = 0.05, seed = 10101)
+LATEtest(
+  data,
+  covars,
+  huge = FALSE,
+  tree_fraction = 0.5,
+  minsize = 100,
+  cp = 0,
+  subsets = 4,
+  alpha = 0.05,
+  seed = 10101
+)
 }
 \arguments{
 \item{data}{provides dataset: outcome must be labelled Y, treatment D and instrument Z}

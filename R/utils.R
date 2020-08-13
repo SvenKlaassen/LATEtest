@@ -68,6 +68,7 @@ gates <- function(sample, treeinuse, ordered_frame) {
       leafdummy[, countleaf] <- ifelse(lapply(lapply(allleaves, is.element, l), max) == 1, 1, 0)
       subgroup <- which(as.logical(leafdummy[, countleaf]))
       ate_mean[countleaf] <- mean(sample$scores[subgroup])
+      scores <- sample$scores[subgroup]
       nnode[countleaf] <- length(sample$scores[subgroup])
       if (sd(sample$scores[subgroup]) != 0) {
         ate_se[countleaf] <- sd(sample$scores[subgroup]) / sqrt(nnode[countleaf] - 1)
@@ -77,7 +78,7 @@ gates <- function(sample, treeinuse, ordered_frame) {
       zeta[countleaf] <- ate_mean[countleaf] / ate_se[countleaf]
     }
   }
-  return(list("zeta" = zeta, "ate_mean" = ate_mean, "nnode" = nnode))
+  return(list("zeta" = zeta, "ate_mean" = ate_mean, "nnode" = nnode, "scores" = scores))
 }
 
 #' Constructs pseudo-outcome, runs regression and causal forests and predicts out-of-bag (oob)
