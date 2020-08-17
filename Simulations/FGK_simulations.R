@@ -72,7 +72,7 @@ set.seed(seed)
 
 ##### Setup DGP #####
 #####################
-setup <- "A"          # A: randomized experiment, B: easy confounding of Z and strong confounding of D
+setup <- "B"          # A: randomized experiment, B: easy confounding of Z and strong confounding of D
 n <- 3000             # number of observations
 R <- 500              # number of Monte Carlo replications
 
