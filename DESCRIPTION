@@ -21,7 +21,7 @@ Imports:
     treeClust
 Suggests: 
     rpart.plot
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Collate: 
     'utils.R'
     'LATEtest.R'

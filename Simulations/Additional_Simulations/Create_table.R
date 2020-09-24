@@ -26,7 +26,7 @@ for (dgp in possible_dgps){
 colnames(data_table) <- c("2","4","6")
 rownames(data_table) <- rep(c("Bonferroni","Bejamini-Hochberg","Benjamini-Yekutieli"),dim(data_table)[1]/3)
 
-kable(data_table ,"latex", booktabs = T,align = "c") %>%
+kable(data_table ,"latex", booktabs = T,align = "c",caption = paste0("Process ",setup)) %>%
   kable_styling() %>%
   pack_rows("DGP0 (exog but uninformative)",1,3) %>%
   pack_rows("DGP1 (exog and relevant)",4,6) %>%

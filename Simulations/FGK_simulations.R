@@ -44,6 +44,9 @@ fct_datasim <- function(setup,dgp){
   } else if(dgp==5) {   # global violation of exclusion restriction but with sign heterogeneity
     a <- 0.2; alpha =  rep(a, n)
     gamma <- as.numeric(ifelse(X[,3]< qnorm(0.5), 0.5, -0.5))
+  } else if(dgp==6) {   # local violation of exclusion restriction but other direction
+    a <- 0.2; alpha =  rep(a, n)
+    gamma <- as.numeric(ifelse(X[,2]< qnorm(0.15), -1.25, 0))
   } else {
     stop("invalid choice of dgp")
   }
@@ -72,12 +75,13 @@ set.seed(seed)
 
 ##### Setup DGP #####
 #####################
-setup <- "B"          # A: randomized experiment, B: easy confounding of Z and strong confounding of D
-n <- 3000             # number of observations
+setup <- "A"          # A: randomized experiment, B: easy confounding of Z and strong confounding of D
+n <- 5000             # number of observations
 R <- 500              # number of Monte Carlo replications
 
-subsets <- 4
+subsets <- 2
 siglevel <- 0.05
+discret <- "uniform"
 
 ##### Setup parallel computing #####
 ####################################
@@ -86,7 +90,7 @@ if(system == 'Windows') {
   cl <- makeCluster(detectCores()-1)
   clusterEvalQ(cl, c(library(LATEtest),library(grf),library(rpart),library(treeClust),library(mvtnorm)))
 } else if(system == 'Darwin') {
-  cl <- makeForkCluster(detectCores())
+  cl <- makeForkCluster(detectCores()-1)
 }
 registerDoParallel(cl)
 showConnections()
@@ -102,13 +106,13 @@ print("--------------------------------------------")
 
 ##### Run simulation #####
 ##########################
-for (dgp in 0:5) {         #loop over all dgps; see fct_datasim() above
+for (dgp in 0:6) {         #loop over all dgps; see fct_datasim() above
   start_time = Sys.time()
   sim <- foreach(r=1:R, .combine=rbind) %dopar% {
     set.seed(r)
     data <- fct_datasim(setup=setup, dgp=dgp)
 
-    test <- LATEtest(data=data, covars=paste0(colnames(data)[4:ncol(data)]), subsets=subsets, alpha=siglevel)
+    test <- LATEtest(data=data, covars=paste0(colnames(data)[4:ncol(data)]), subsets=subsets, alpha=siglevel, discret = discret)
 
     reject_BHolm <- sapply(test$results$pvalues_BHolm_leaves, function(x) any(x<siglevel))
     reject_BHoch <- sapply(test$results$pvalues_BHoch_leaves, function(x) any(x<siglevel))
@@ -151,7 +155,7 @@ for (dgp in 0:5) {         #loop over all dgps; see fct_datasim() above
   print(table(sim$dim1))
   print("table(sim$dim2)")
   print(table(sim$dim2))
-  save.image(file=paste("FGK","_setup",setup,"_n",n,"_subsets",subsets,"_dgp",dgp,".Rdata",sep=""))
+  save.image(file=paste("FGK","_setup",setup,"_n",n,"_subsets",subsets,"_dgp",dgp,"_",discret,".Rdata",sep=""))
   print("--------------------------------------")
 }
 sink(file=NULL)
