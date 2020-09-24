@@ -79,7 +79,7 @@ setup <- "A"          # A: randomized experiment, B: easy confounding of Z and s
 n <- 5000             # number of observations
 R <- 500              # number of Monte Carlo replications
 
-subsets <- 2
+subsets <- 6
 siglevel <- 0.05
 discret <- "uniform"
 
