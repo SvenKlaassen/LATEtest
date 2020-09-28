@@ -1,6 +1,6 @@
 
 
-setwd("D:/GitHub/LATEtest/Simulations/Additional_Simulations")
+setwd("C:/Users/svenk/University/Github/LATEtest/Simulations/Additional_Simulations")
 
 library(kableExtra)
 library(knitr)
@@ -10,7 +10,7 @@ setup  <- "A"
 discret <- "uniform"
 
 possible_subsets <- c(2,4,6)
-possible_dgps <- 0:6
+possible_dgps <- 0:7
 
 data_table <- data.frame("2" = double(),"4" = double(),"6" = double())
 for (dgp in possible_dgps){
@@ -35,6 +35,6 @@ kable(data_table ,"latex", booktabs = T,align = "c",caption = paste0("Process ",
   pack_rows("DGP3 (local direct effects)",10,12) %>%
   pack_rows("DGP4 (global direct effects)",13,15) %>%
   pack_rows("DGP5 (global direct effects, varying signs)",16,18) %>%
-  pack_rows("DGP6 (local direct effects, but different subset)",19,21) %>%
+  pack_rows("DGP6 (local direct effects,gamma =-1,25,Phi(0.15))",19,21) %>%
+  pack_rows("DGP7 (local direct effects,gamma =1,25,Phi(0.85))",22,24) %>%
   footnote(general = paste0("Based on 500 replications for significance level of 0.05 and n=",n,"."))
-
